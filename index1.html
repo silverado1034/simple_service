@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSSAA Change of School Application Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            width: 100%;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            font-weight: 700;
+        }
+
+        .phase-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .question-container {
+            margin: 30px 0;
+            padding: 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+        }
+
+        .question-container.active {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+        }
+
+        .question {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+
+        .answer-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .answer-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 25px;
+            border: 2px solid #667eea;
+            background: white;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .answer-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .answer-btn.selected {
+            background: #667eea;
+            color: white;
+        }
+
+        .result {
+            margin: 30px 0;
+            padding: 25px;
+            border-radius: 12px;
+            font-size: 1.2em;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .result.success {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .result.warning {
+            background: linear-gradient(135deg, #FF9800, #F57C00);
+            color: white;
+        }
+
+        .result.error {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+
+        .restart-btn {
+            display: block;
+            margin: 30px auto 0;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .student-input {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .student-input input {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1.1em;
+            width: 250px;
+            text-align: center;
+            transition: border-color 0.3s ease;
+        }
+
+        .student-input input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .student-input label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .reset-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        @media (max-width: 600px) {
+            .reset-btn {
+                top: 10px;
+                right: 10px;
+                padding: 8px 15px;
+                font-size: 0.9em;
+            }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .answer-buttons {
+                flex-direction: column;
+            }
+            
+            .answer-btn {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="reset-btn" onclick="restart()">Reset</button>
+    
+    <div class="container">
+        <h1>OSSAA Change of School Application Guide</h1>
+        
+        <div class="student-input">
+            <label for="studentName">Student's Name:</label>
+            <input type="text" id="studentName" placeholder="Enter student's name" value="Sam">
+        </div>
+
+        <div id="phase1" class="phase-header">
+            Phase 1: Initial Pre-Screening
+        </div>
+
+        <div id="question1" class="question-container active">
+            <div class="question">Is this the first time Sam is participating in an OSSAA-sanctioned activity at the high school level (grades 9-12)?</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="handleAnswer(1, 'A')">Yes</button>
+                <button class="answer-btn" onclick="handleAnswer(1, 'B')">No</button>
+            </div>
+        </div>
+
+        <div id="question2" class="question-container hidden">
+            <div class="question">Is Jenks High School the only high school that Sam has attended since starting the 9th grade?</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="handleAnswer(2, 'A')">Yes</button>
+                <button class="answer-btn" onclick="handleAnswer(2, 'B')">No</button>
+            </div>
+        </div>
+
+        <div id="phase2" class="phase-header hidden">
+            Phase 2: Change of School Questions
+        </div>
+
+        <div id="question3" class="question-container hidden">
+            <div class="question">Did Sam change schools because your family moved?</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="handleAnswer(3, 'A')">No</button>
+                <button class="answer-btn" onclick="handleAnswer(3, 'B')">Yes</button>
+            </div>
+        </div>
+
+        <div id="question4" class="question-container hidden">
+            <div class="question">Did your family move into the boundaries of the new school?</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="handleAnswer(4, 'A')">No</button>
+                <button class="answer-btn" onclick="handleAnswer(4, 'B')">Yes</button>
+            </div>
+        </div>
+
+        <div id="question5" class="question-container hidden">
+            <div class="question">Did your family vacate the previous residence?</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="handleAnswer(5, 'A')">No</button>
+                <button class="answer-btn" onclick="handleAnswer(5, 'B')">Yes</button>
+            </div>
+        </div>
+
+        <div id="question5b" class="question-container hidden">
+            <div class="question">Did Sam's family sell their former home or give up any ownership or rights to it (for example, by transferring the deed, ending a lease, or otherwise vacating it)?</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="handleAnswer('5b', 'A')">No</button>
+                <button class="answer-btn" onclick="handleAnswer('5b', 'B')">Yes</button>
+            </div>
+        </div>
+
+        <div id="criteriaHeader" class="phase-header hidden">
+            Criteria-Based Questions
+        </div>
+
+        <div id="question6" class="question-container hidden">
+            <div class="question">Will Sam be living with the same parent(s)/guardian(s) they lived with at their previous school?</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="handleAnswer(6, 'A')">No</button>
+                <button class="answer-btn" onclick="handleAnswer(6, 'B')">Yes</button>
+            </div>
+        </div>
+
+        <div id="question7" class="question-container hidden">
+            <div class="question">Is this the first time you are changing schools/districts without a corresponding move of residence?</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="handleAnswer(7, 'A')">No</button>
+                <button class="answer-btn" onclick="handleAnswer(7, 'B')">Yes</button>
+            </div>
+        </div>
+
+        <div id="question8" class="question-container hidden">
+            <div class="question">Did you meet the July 15th deadline for submitting a transfer request on the Oklahoma State Department of Education Portal?</div>
+            <div class="answer-buttons">
+                <button class="answer-btn" onclick="handleAnswer(8, 'A')">No</button>
+                <button class="answer-btn" onclick="handleAnswer(8, 'B')">Yes</button>
+            </div>
+        </div>
+
+        <div id="result" class="hidden"></div>
+        
+        <button id="restartBtn" class="restart-btn hidden" onclick="restart()">Start Over</button>
+    </div>
+
+    <script>
+        let currentQuestion = 1;
+        let answers = {};
+
+        function updateStudentName() {
+            const studentName = document.getElementById('studentName').value || 'Sam';
+            const placeholders = document.querySelectorAll('.student-placeholder');
+            placeholders.forEach(placeholder => {
+                placeholder.textContent = studentName;
+            });
+        }
+
+        // Update student name as user types
+        document.getElementById('studentName').addEventListener('input', updateStudentName);
+
+        function hideAllQuestions() {
+            for (let i = 1; i <= 8; i++) {
+                document.getElementById(`question${i}`).classList.add('hidden');
+                document.getElementById(`question${i}`).classList.remove('active');
+            }
+            document.getElementById('question5b').classList.add('hidden');
+            document.getElementById('question5b').classList.remove('active');
+            document.getElementById('phase2').classList.add('hidden');
+            document.getElementById('criteriaHeader').classList.add('hidden');
+        }
+
+        function showQuestion(questionNum) {
+            hideAllQuestions();
+            const questionId = `question${questionNum}`;
+            document.getElementById(questionId).classList.remove('hidden');
+            document.getElementById(questionId).classList.add('active');
+            currentQuestion = questionNum;
+        }
+
+        function showResult(message, type) {
+            hideAllQuestions();
+            const result = document.getElementById('result');
+            result.innerHTML = message;
+            result.className = `result ${type}`;
+            result.classList.remove('hidden');
+            document.getElementById('restartBtn').classList.remove('hidden');
+        }
+
+        function handleAnswer(questionNum, answer) {
+            answers[questionNum] = answer;
+            
+            // Update button styles
+            const buttons = document.querySelectorAll(`#question${questionNum} .answer-btn`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+
+            setTimeout(() => {
+                processAnswer(questionNum, answer);
+            }, 500);
+        }
+
+        function processAnswer(questionNum, answer) {
+            switch(questionNum) {
+                case 1:
+                    if (answer === 'A') {
+                        showResult('🎉 Great! Since this is the first time, no "Change of School" paperwork is needed. You can proceed with the standard registration forms.', 'success');
+                    } else {
+                        showQuestion(2);
+                    }
+                    break;
+                
+                case 2:
+                    if (answer === 'A') {
+                        showResult('🎉 Great! Since there\'s no change of school, no "Change of School" paperwork is needed. You can proceed with the standard registration forms.', 'success');
+                    } else {
+                        document.getElementById('phase1').classList.add('hidden');
+                        document.getElementById('phase2').classList.remove('hidden');
+                        showQuestion(3);
+                    }
+                    break;
+                
+                case 3:
+                    if (answer === 'A') {
+                        document.getElementById('criteriaHeader').classList.remove('hidden');
+                        showQuestion(6);
+                    } else {
+                        showQuestion(4);
+                    }
+                    break;
+                
+                case 4:
+                    if (answer === 'A') {
+                        document.getElementById('criteriaHeader').classList.remove('hidden');
+                        showQuestion(6);
+                    } else {
+                        showQuestion(5);
+                    }
+                    break;
+                
+                case 5:
+                    if (answer === 'A') {
+                        showResult('🚨 <strong>Criteria 2 Track</strong>', 'warning');
+                    } else {
+                        showQuestion('5b');
+                    }
+                    break;
+                
+                case '5b':
+                    if (answer === 'A') {
+                        showResult('🚨 <strong>Criteria 2 Track</strong>', 'warning');
+                    } else {
+                        document.getElementById('criteriaHeader').classList.remove('hidden');
+                        showQuestion(6);
+                    }
+                    break;
+                
+                case 6:
+                    if (answer === 'A') {
+                        showResult('🚨 <strong>Criteria 2 Track</strong>', 'warning');
+                    } else {
+                        // Check if this is coming from the bonafide move path (questions 3,4,5,5b all "Yes")
+                        if (answers[3] === 'B' && answers[4] === 'B' && answers[5] === 'B' && answers['5b'] === 'B') {
+                            showResult('✅ <strong>Bonafide Move Confirmed!</strong>', 'success');
+                        } else {
+                            showQuestion(7);
+                        }
+                    }
+                    break;
+                
+                case 7:
+                    if (answer === 'A') {
+                        showResult('🚨 <strong>Criteria 2 Track</strong>', 'warning');
+                    } else {
+                        showQuestion(8);
+                    }
+                    break;
+                
+                case 8:
+                    if (answer === 'A') {
+                        showResult('🚨 <strong>Criteria 2 Track</strong>', 'warning');
+                    } else {
+                        showResult('✅ <strong>Criteria 1 Track</strong>', 'success');
+                    }
+                    break;
+            }
+        }
+
+        function restart() {
+            answers = {};
+            currentQuestion = 1;
+            
+            // Reset student name
+            document.getElementById('studentName').value = 'Sam';
+            updateStudentName();
+            
+            // Hide all elements
+            hideAllQuestions();
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('restartBtn').classList.add('hidden');
+            document.getElementById('phase1').classList.remove('hidden');
+            document.getElementById('phase2').classList.add('hidden');
+            document.getElementById('criteriaHeader').classList.add('hidden');
+            
+            // Show first question
+            document.getElementById('question1').classList.remove('hidden');
+            document.getElementById('question1').classList.add('active');
+            
+            // Reset all button selections
+            document.querySelectorAll('.answer-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+        }
+    </script>
+</body>
+</html>
