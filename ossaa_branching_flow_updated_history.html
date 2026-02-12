@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OSSAA Branching - Criteria 1 / 2 / Bona Fide (Working Model)</title>
+  <style>
+    :root{--bg:#0b0f19;--card:#121a2b;--muted:#9fb0d0;--text:#eaf0ff;--accent:#7aa2ff;--good:#2ecc71;--warn:#f1c40f;--bad:#ff6b6b;}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);}
+    .wrap{max-width:980px;margin:28px auto;padding:0 16px;}
+    .title{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
+    h1{font-size:20px;margin:0 0 6px 0}
+    .sub{color:var(--muted);font-size:13px;margin:0 0 18px 0;line-height:1.4}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .card{background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+    .qno{display:inline-block;font-size:12px;color:var(--muted);border:1px solid rgba(255,255,255,.12);padding:2px 8px;border-radius:999px;margin-bottom:10px}
+    .qtext{font-size:16px;line-height:1.35;margin:0 0 14px 0}
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap}
+    button{border:0;border-radius:12px;padding:10px 14px;font-weight:600;cursor:pointer}
+    .yes{background:rgba(46,204,113,.18);color:var(--text);outline:1px solid rgba(46,204,113,.35)}
+    .no{background:rgba(255,107,107,.18);color:var(--text);outline:1px solid rgba(255,107,107,.35)}
+    .ghost{background:transparent;color:var(--text);outline:1px solid rgba(255,255,255,.18)}
+    .small{padding:8px 10px;border-radius:10px;font-size:12px;font-weight:600;color:var(--muted)}
+    .outcome{padding:12px 12px;border-radius:12px;margin-top:10px;line-height:1.35}
+    .out-good{background:rgba(46,204,113,.12);outline:1px solid rgba(46,204,113,.28)}
+    .out-warn{background:rgba(241,196,15,.12);outline:1px solid rgba(241,196,15,.28)}
+    .out-bad{background:rgba(255,107,107,.12);outline:1px solid rgba(255,107,107,.28)}
+    .outcome h2{font-size:16px;margin:0 0 6px 0}
+    .outcome p{margin:0;color:var(--text)}
+    .muted{color:var(--muted)}
+    .list{margin:10px 0 0 0;padding:0 0 0 18px;color:var(--muted);font-size:13px}
+    .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;margin-left:6px;color:var(--muted);border:1px solid rgba(255,255,255,.14)}
+    .history{font-size:13px;color:var(--muted);line-height:1.4}
+    .history ol{margin:8px 0 0 18px;padding:0}
+    .history li{margin:6px 0}
+    .history li button{all:unset;cursor:pointer;display:block;padding:8px 10px;border-radius:10px;outline:1px solid rgba(255,255,255,.10)}
+    .history li button:hover{outline:1px solid rgba(122,162,255,.45)}
+    .history li .ans{font-weight:700}
+    .path-inline{margin-top:10px}
+    .code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px;color:#cfe0ff}
+    .footer{margin-top:14px;color:var(--muted);font-size:12px;line-height:1.45}
+    a{color:var(--accent)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="title">
+      <div>
+        <h1>OSSAA Transfer Decision Tree (Interactive)</h1>
+        <p class="sub">
+          Working model based on the latest meeting notes: Bona Fide path → else Criteria Gate (Q9/Q10). 
+          This page is for validating branch completeness on-screen (not a production form).
+        </p>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card" id="mainCard">
+        <div class="qno" id="qNo">—</div>
+        <p class="qtext" id="qText">Loading…</p>
+
+        <div id="pathInline" class="history" style="margin:10px 0 0 0; display:none"></div>
+
+        <div class="btnrow" id="btnRow">
+          <button class="yes" id="btnYes" type="button">Yes</button>
+          <button class="no" id="btnNo" type="button">No</button>
+          <button class="ghost" id="btnBack" type="button">Back</button>
+          <button class="ghost" id="btnReset" type="button">Reset</button>
+        </div>
+
+        <div id="outcomeBox" class="outcome" style="display:none"></div>
+
+        <div class="footer">
+          <div class="muted">Current node: <span class="code" id="nodeId">—</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="qno">Answer history</div>
+        <div class="history" id="history">
+          <div class="muted">Your selections will appear here.</div>
+        </div>
+
+        <div class="footer">
+          <div><span class="pill">Clean</span> No waiver needed</div>
+          <div><span class="pill">Bona Fide</span> School-level approval path</div>
+          <div><span class="pill">Criteria 1</span> Protected transfer path</div>
+          <div><span class="pill">Criteria 2</span> Hardship/other waiver path</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  // Decision tree (Mermaid-aligned, updated per your latest correction: Q8 No -> Criteria 2)
+  const NODES = {
+    Q1: { qno: "Q1", text: "Is this the first time the student is participating in an OSSAA-sanctioned activity at the high school level (grades 9–12)?", yes: "Q2", no: "Q3" },
+
+    Q2: { qno: "Q2", text: "Do you live with someone now other than whom you lived with last school year?", yes: "Q9", no: "OUT_CLEAN" },
+
+    Q3: { qno: "Q3", text: "Is the current school the only high school the student has participated at since starting 9th grade?", yes: "OUT_CLEAN", no: "Q4" },
+
+    Q4: { qno: "Q4", text: "Did the student change schools because your family moved?", yes: "Q5", no: "Q9" },
+
+    Q5: { qno: "Q5", text: "Did your family move into the boundaries of the new school?", yes: "Q6", no: "Q9" }, // key fix: do NOT auto Criteria 2
+
+    Q6: { qno: "Q6", text: "Did your family vacate the previous residence?", yes: "Q7", no: "OUT_C2" },
+
+    Q7: { qno: "Q7", text: "Did your family sell or give up any ownership or rights to the previous home (for example, by transferring the deed, ending a lease, or otherwise vacating it)?", yes: "Q8", no: "OUT_C2" },
+
+    Q8: { qno: "Q8", text: "Will the student live with the same parent(s)/guardian(s) they lived with at their previous school?", yes: "OUT_BF", no: "OUT_C2" },
+
+    Q9: { qno: "Q9", text: "Is this the first time you are changing schools/districts without a move of residence?", yes: "Q10", no: "OUT_C2" },
+
+    Q10:{ qno: "Q10", text: "Did you meet the July 15th deadline for submitting a transfer request on the Oklahoma State Department of Education portal?", yes: "OUT_C1", no: "OUT_C2" },
+
+    OUT_CLEAN: { outcome: true, title: "Clean - No Waiver Needed", style: "out-good",
+      text: "Based on the answers selected, no waiver is required in this flow." },
+
+    OUT_BF: { outcome: true, title: "Bona Fide Move", style: "out-good",
+      text: "Bona fide move path. This should be handled as a school-level approval (non-transfer) per the current model." },
+
+    OUT_C1: { outcome: true, title: "Criteria 1", style: "out-warn",
+      text: "Criteria 1 pathway (protected). Next steps usually include required documentation validating the July 15 deadline (OSDE transfer request or return-home enrollment proof)." },
+
+    OUT_C2: { outcome: true, title: "Criteria 2", style: "out-bad",
+      text: "Criteria 2 pathway (hardship/other). Next steps should collect the appropriate Criteria 2 life-situation selection, summary, and supporting documentation uploads." }
+  };
+
+  // UI bindings
+  const qNo = document.getElementById("qNo");
+  const qText = document.getElementById("qText");
+  const nodeId = document.getElementById("nodeId");
+  const outcomeBox = document.getElementById("outcomeBox");
+
+  const btnYes = document.getElementById("btnYes");
+  const btnNo = document.getElementById("btnNo");
+  const btnBack = document.getElementById("btnBack");
+  const btnReset = document.getElementById("btnReset");
+  const historyEl = document.getElementById("history");
+  const pathInline = document.getElementById("pathInline");
+
+  // State
+  let current = "Q1";
+  const stack = []; // {node, answer, next}
+  const answers = {}; // node -> Yes/No
+
+  function render() {
+    const node = NODES[current];
+    nodeId.textContent = current;
+
+    // Outcome vs question
+    if (node && node.outcome) {
+      qNo.textContent = "Outcome";
+      qText.textContent = node.title;
+      outcomeBox.style.display = "block";
+      outcomeBox.className = "outcome " + (node.style || "");
+      outcomeBox.innerHTML = "<h2>" + escapeHtml(node.title) + "</h2><p>" + escapeHtml(node.text || "") + "</p>";
+
+      btnYes.disabled = true;
+      btnNo.disabled = true;
+    } else {
+      outcomeBox.style.display = "none";
+      qNo.textContent = node?.qno || "—";
+      qText.textContent = node?.text || "—";
+
+      btnYes.disabled = false;
+      btnNo.disabled = false;
+    }
+
+    btnBack.disabled = stack.length === 0;
+    renderHistory();
+  }
+
+  function renderHistory(){
+  if (!stack.length) {
+    historyEl.innerHTML = '<div class="muted">Your selections will appear here.</div>';
+    pathInline.innerHTML = '';
+    pathInline.style.display = 'none';
+    return;
+  }
+
+  const items = stack.map((h, idx) => {
+    const n = NODES[h.node];
+    const label = n?.label || h.node;
+    const q = n?.text || "";
+    const a = h.answer;
+    return `
+      <li>
+        <button type="button" data-step="${idx}" title="Click to jump back to this step">
+          <div><span class="code">${escapeHtml(label)}</span> ${escapeHtml(q)}</div>
+          <div class="muted">Answer: <span class="ans">${escapeHtml(a)}</span></div>
+        </button>
+      </li>`;
+  }).join("");
+
+  historyEl.innerHTML = `<ol>${items}</ol>`;
+
+  // Inline (compact) path preview inside the main card
+  const last = stack.slice(-4).map(h => {
+    const n = NODES[h.node];
+    const label = n?.label || h.node;
+    return `<span class="pill">${escapeHtml(label)}: <strong>${escapeHtml(h.answer)}</strong></span>`;
+  }).join(" ");
+
+  pathInline.innerHTML = `<div class="muted" style="margin-bottom:6px">Path so far:</div><div>${last}</div>`;
+  pathInline.style.display = 'block';
+
+  // Click-to-jump
+  historyEl.querySelectorAll('button[data-step]').forEach(btn => {
+    btn.addEventListener('click', () => jumpToStep(parseInt(btn.dataset.step,10)));
+  });
+}
+
+
+  function go(answer){
+    const node = NODES[current];
+    if (!node || node.outcome) return;
+
+    const next = (answer === "Yes") ? node.yes : node.no;
+    if (!next || !NODES[next]) {
+      // Safety: show an error outcome instead of breaking
+      alert("Branch is missing for " + current + " -> " + answer + ". Next node: " + next);
+      return;
+    }
+
+    answers[current] = answer;
+    stack.push({ node: current, answer, next });
+    current = next;
+    render();
+  }
+
+  function jumpToStep(stepIdx){
+    // stepIdx refers to position in stack (0-based)
+    if (isNaN(stepIdx) || stepIdx < 0 || stepIdx >= stack.length) return;
+    // Remove answers for steps after the target
+    for (let i = stack.length - 1; i > stepIdx; i--){
+      const s = stack[i];
+      delete answers[s.node];
+    }
+    // Set current question to the selected step's node
+    current = stack[stepIdx].node;
+    // Truncate stack so it ends just before the current question
+    stack.length = stepIdx;
+    render();
+  }
+
+  function back(){
+    const prev = stack.pop();
+    if (!prev) return;
+    delete answers[prev.node];
+    current = prev.node;
+    render();
+  }
+
+  function reset(){
+    current = "Q1";
+    stack.length = 0;
+    for (const k in answers) delete answers[k];
+    render();
+  }
+
+  function escapeHtml(s){
+    return String(s)
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#39;");
+  }
+
+  // Wire up
+  btnYes.addEventListener("click", () => go("Yes"));
+  btnNo.addEventListener("click", () => go("No"));
+  btnBack.addEventListener("click", back);
+  btnReset.addEventListener("click", reset);
+
+  // Init
+  render();
+})();
+</script>
+</body>
+</html>
