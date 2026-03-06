@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OSSAA Transfer Eligibility – Flow Mockup</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #0d2240;
+    --navy-mid:#163558;
+    --slate:   #4a6080;
+    --silver:  #e8edf3;
+    --white:   #ffffff;
+    --accent:  #c8932a;
+
+    --clean-bg:   #1a6e3c;
+    --clean-text: #ffffff;
+    --c1-bg:      #b07d00;
+    --c1-text:    #fff8e1;
+    --c2-bg:      #8b2020;
+    --c2-text:    #ffffff;
+    --dual-bg:    #7a2060;
+    --dual-text:  #ffffff;
+    --bf-bg:      #3a5a3a;
+    --bf-text:    #ffffff;
+    --inprog-bg:  #2a3f5c;
+    --inprog-text:#d0daea;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #f0f3f7;
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .site-header {
+    background: var(--navy);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 3px solid var(--accent);
+  }
+  .site-header .logo-mark {
+    width: 44px; height: 44px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px; color: #fff;
+    flex-shrink: 0;
+  }
+  .site-header .org-name {
+    font-family: 'DM Serif Display', serif;
+    color: #fff;
+    font-size: 18px;
+    letter-spacing: 0.02em;
+  }
+  .site-header .org-sub {
+    color: #8ea8c8;
+    font-size: 12px;
+    font-weight: 300;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .mock-pill {
+    margin-left: auto;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  /* ── Page wrapper ── */
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+
+  /* ── Page title ── */
+  .page-title-block {
+    margin-bottom: 28px;
+  }
+  .page-title-block h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--navy);
+    line-height: 1.2;
+  }
+  .page-title-block .subtitle {
+    color: var(--slate);
+    font-size: 14px;
+    margin-top: 6px;
+    font-weight: 400;
+  }
+  .flow-tag {
+    display: inline-block;
+    background: var(--navy);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+  }
+
+  /* ── Status Banner ── */
+  .status-banner {
+    border-radius: 10px;
+    padding: 16px 22px;
+    margin-bottom: 30px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: background 0.35s, color 0.35s;
+    position: relative;
+    overflow: hidden;
+  }
+  .status-banner::before {
+    content: '';
+    position: absolute; left: 0; top: 0; bottom: 0;
+    width: 5px;
+    background: rgba(255,255,255,0.35);
+    border-radius: 10px 0 0 10px;
+  }
+  .status-banner .status-icon {
+    font-size: 26px;
+    flex-shrink: 0;
+  }
+  .status-banner .status-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    opacity: 0.75;
+    margin-bottom: 2px;
+  }
+  .status-banner .status-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .banner-inprog  { background: var(--inprog-bg); color: var(--inprog-text); }
+  .banner-clean   { background: var(--clean-bg);   color: var(--clean-text); }
+  .banner-c1      { background: var(--c1-bg);      color: var(--c1-text); }
+  .banner-c2      { background: var(--c2-bg);      color: var(--c2-text); }
+  .banner-dual    { background: var(--dual-bg);     color: var(--dual-text); }
+  .banner-bf      { background: var(--bf-bg);       color: var(--bf-text); }
+
+  /* ── Question card ── */
+  .question-card {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 24px 26px;
+    margin-bottom: 16px;
+    border: 1.5px solid var(--silver);
+    box-shadow: 0 2px 8px rgba(13,34,64,0.06);
+    display: none;
+    animation: slideIn 0.25s ease;
+  }
+  .question-card.visible { display: block; }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-number {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--slate);
+    margin-bottom: 8px;
+  }
+  .q-text {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--navy);
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .q-text em {
+    font-style: normal;
+    font-weight: 600;
+    color: var(--navy-mid);
+    background: #e8f0fb;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .q-note {
+    font-size: 12px;
+    color: var(--slate);
+    font-style: italic;
+    margin-top: -10px;
+    margin-bottom: 14px;
+  }
+
+  .btn-group {
+    display: flex;
+    gap: 12px;
+  }
+  .btn-yes, .btn-no {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s;
+    letter-spacing: 0.02em;
+  }
+  .btn-yes {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+  }
+  .btn-yes:hover { background: var(--navy-mid); border-color: var(--navy-mid); }
+  .btn-no {
+    background: var(--white);
+    color: var(--navy);
+    border-color: #c0ccdb;
+  }
+  .btn-no:hover { border-color: var(--navy); background: var(--silver); }
+
+  /* Selected states */
+  .btn-yes.selected { background: #1a6e3c; border-color: #1a6e3c; box-shadow: 0 0 0 3px rgba(26,110,60,0.18); }
+  .btn-no.selected  { background: #8b2020; color: #fff; border-color: #8b2020; box-shadow: 0 0 0 3px rgba(139,32,32,0.15); }
+
+  /* ── Reset button ── */
+  .reset-wrap {
+    margin-top: 28px;
+    text-align: center;
+  }
+  .btn-reset {
+    background: transparent;
+    border: 2px solid #c0ccdb;
+    color: var(--slate);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: all 0.18s;
+  }
+  .btn-reset:hover { border-color: var(--navy); color: var(--navy); background: var(--silver); }
+
+  /* ── Outcome note (inside card for terminal Q) ── */
+  .outcome-note {
+    display: none;
+    margin-top: 14px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    border-left: 4px solid;
+  }
+  .outcome-note.show { display: block; }
+  .outcome-note.clean  { background: #eaf5ef; border-color: var(--clean-bg); color: #145c30; }
+  .outcome-note.c2     { background: #fdf0f0; border-color: #8b2020; color: #6b1818; }
+  .outcome-note.c1     { background: #fdf7e6; border-color: #b07d00; color: #7a5500; }
+  .outcome-note.dual   { background: #f7eef5; border-color: #7a2060; color: #5c1748; }
+  .outcome-note.bf     { background: #eaf2ea; border-color: #3a5a3a; color: #2a4a2a; }
+
+  /* ── Progress trail ── */
+  .progress-trail {
+    font-size: 12px;
+    color: var(--slate);
+    margin-bottom: 20px;
+    font-weight: 400;
+  }
+  .progress-trail span { color: var(--navy); font-weight: 600; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-mark">O</div>
+  <div>
+    <div class="org-name">OSSAA</div>
+    <div class="org-sub">Oklahoma Secondary School Activities Association</div>
+  </div>
+  <div class="mock-pill">⚠ Mockup</div>
+</header>
+
+<div class="page">
+
+  <div class="page-title-block">
+    <div class="flow-tag">Flow Variant A</div>
+    <h1>Form Flow with Previous Transfer Guard</h1>
+    <p class="subtitle">
+      Student Transfer Eligibility Screener &nbsp;·&nbsp; School: <strong>Edmonds North HS</strong>
+      &nbsp;·&nbsp; This is a prototype for OSSAA admin review. No data is saved.
+    </p>
+  </div>
+
+  <!-- STATUS BANNER -->
+  <div class="status-banner banner-inprog" id="statusBanner">
+    <div class="status-icon" id="statusIcon">⏳</div>
+    <div>
+      <div class="status-label">Application Status</div>
+      <div class="status-value" id="statusValue">In Progress</div>
+    </div>
+  </div>
+
+  <div class="progress-trail" id="progressTrail">Answer the questions below to determine eligibility.</div>
+
+  <!-- Q1 -->
+  <div class="question-card visible" id="card-q1">
+    <div class="q-number">Question 1</div>
+    <div class="q-text">Has the student ever participated in an OSSAA-sanctioned athletic activity at the high school level (grades 9–12)?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(1,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(1,'no')">No</button>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="question-card" id="card-q2">
+    <div class="q-number">Question 2</div>
+    <div class="q-text">Are you still living with the same parent/guardian that you lived with last year?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(2,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(2,'no')">No</button>
+    </div>
+    <div class="outcome-note clean" id="note-q2-yes">→ <strong>Clean – No Waiver.</strong> Student has not previously participated; living situation unchanged.</div>
+    <div class="outcome-note c2"   id="note-q2-no">→ <strong>Criteria 2 Waiver required.</strong> Living situation has changed.</div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="question-card" id="card-q3">
+    <div class="q-number">Question 3</div>
+    <div class="q-text">Have you participated at a different high school other than <em>Edmonds North HS</em> since starting the 9th grade?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(3,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(3,'no')">No</button>
+    </div>
+    <div class="outcome-note clean" id="note-q3-no">→ <strong>Clean – No Waiver.</strong> Student has only participated at this school.</div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="question-card" id="card-q4">
+    <div class="q-number">Question 4</div>
+    <div class="q-text">Have you participated at a different high school other than <em>Edmonds North HS</em> in the last 12 months?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(4,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(4,'no')">No</button>
+    </div>
+    <div class="outcome-note clean" id="note-q4-no">→ <strong>Clean – No Waiver.</strong> Transfer was more than 12 months ago — student is not subject to current-year waiver requirement.</div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="question-card" id="card-q5">
+    <div class="q-number">Question 5</div>
+    <div class="q-text">Did the student change schools because your family moved?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(5,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(5,'no')">No</button>
+    </div>
+  </div>
+
+  <!-- Q6 -->
+  <div class="question-card" id="card-q6">
+    <div class="q-number">Question 6</div>
+    <div class="q-text">Did your family move into the boundaries of the new school?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(6,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(6,'no')">No</button>
+    </div>
+  </div>
+
+  <!-- Q7 -->
+  <div class="question-card" id="card-q7">
+    <div class="q-number">Question 7</div>
+    <div class="q-text">Did your family vacate the previous residence?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(7,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(7,'no')">No</button>
+    </div>
+    <div class="outcome-note dual" id="note-q7-no">→ <strong>Dual Residence Waiver required.</strong> Previous residence was not vacated.</div>
+  </div>
+
+  <!-- Q8 -->
+  <div class="question-card" id="card-q8">
+    <div class="q-number">Question 8</div>
+    <div class="q-text">Did your family sell or give up any ownership or rights to the previous home (for example, by transferring the deed, ending a lease, or otherwise vacating it)?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(8,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(8,'no')">No</button>
+    </div>
+    <div class="outcome-note dual" id="note-q8-no">→ <strong>Dual Residence Waiver required.</strong> Ownership or rights to previous home were retained.</div>
+  </div>
+
+  <!-- Q9 -->
+  <div class="question-card" id="card-q9">
+    <div class="q-number">Question 9</div>
+    <div class="q-text">Will the student live with the same parent(s)/guardian(s) they lived with at their previous school?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(9,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(9,'no')">No</button>
+    </div>
+    <div class="outcome-note bf" id="note-q9-yes">→ <strong>Bonafide Move.</strong> Family completed a full, legitimate relocation.</div>
+    <div class="outcome-note c2" id="note-q9-no">→ <strong>Criteria 2 Waiver required.</strong> Student will not live with the same guardian(s).</div>
+  </div>
+
+  <!-- Q10 -->
+  <div class="question-card" id="card-q10">
+    <div class="q-number">Question 10</div>
+    <div class="q-text">Including this school year, will this be only the second high school where the student has participated in athletics since entering 9th grade?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(10,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(10,'no')">No</button>
+    </div>
+    <div class="outcome-note c2" id="note-q10-no">→ <strong>Criteria 2 Waiver required.</strong> Student has attended more than two schools.</div>
+  </div>
+
+  <!-- Q11 -->
+  <div class="question-card" id="card-q11">
+    <div class="q-number">Question 11</div>
+    <div class="q-text">Did you meet the July 15 deadline for submitting a transfer request on the OSDE portal, <em>OR</em> have you re-enrolled in your home district of residence?</div>
+    <div class="btn-group">
+      <button class="btn-yes" onclick="answer(11,'yes')">Yes</button>
+      <button class="btn-no"  onclick="answer(11,'no')">No</button>
+    </div>
+    <div class="outcome-note c1" id="note-q11-yes">→ <strong>Criteria 1 Waiver required.</strong> Deadline met or re-enrolled in home district.</div>
+    <div class="outcome-note c2" id="note-q11-no">→ <strong>Criteria 2 Waiver required.</strong> Deadline was not met and student did not re-enroll in home district.</div>
+  </div>
+
+  <div class="reset-wrap">
+    <button class="btn-reset" onclick="resetAll()">↺ &nbsp;Reset All Answers</button>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ── State ──
+var answers = {}; // { 1: 'yes'|'no', 2: ... }
+
+// ── Decision tree: for each question + answer, what's next? ──
+// next: question number, or outcome string
+var tree = {
+  1:  { yes: { next: 3 },  no:  { next: 2 } },
+  2:  { yes: { outcome: 'clean' },    no:  { outcome: 'c2' } },
+  3:  { yes: { next: 4 },  no:  { outcome: 'clean' } },
+  4:  { yes: { next: 5 },  no:  { outcome: 'clean' } },
+  5:  { yes: { next: 6 },  no:  { next: 10 } },
+  6:  { yes: { next: 7 },  no:  { next: 10 } },
+  7:  { yes: { next: 8 },  no:  { outcome: 'dual' } },
+  8:  { yes: { next: 9 },  no:  { outcome: 'dual' } },
+  9:  { yes: { outcome: 'bf' },       no:  { outcome: 'c2' } },
+  10: { yes: { next: 11 }, no:  { outcome: 'c2' } },
+  11: { yes: { outcome: 'c1' },       no:  { outcome: 'c2' } }
+};
+
+var outcomes = {
+  clean: { label: 'Clean – No Waiver',        banner: 'banner-clean', icon: '✅' },
+  c1:    { label: 'Criteria 1 Waiver',        banner: 'banner-c1',   icon: '⚠️' },
+  c2:    { label: 'Criteria 2 Waiver',        banner: 'banner-c2',   icon: '🚫' },
+  dual:  { label: 'Dual Residence Waiver',    banner: 'banner-dual', icon: '🏠' },
+  bf:    { label: 'Bonafide Move',            banner: 'banner-bf',   icon: '📦' }
+};
+
+// ── Which questions are currently visible (in order shown) ──
+var visibleQuestions = [1];
+
+function answer(qNum, val) {
+  // Hide & clear everything that came AFTER this question in the visible list
+  var idx = visibleQuestions.indexOf(qNum);
+  if (idx >= 0) {
+    var toRemove = visibleQuestions.splice(idx + 1);
+    toRemove.forEach(function(q) {
+      hideCard(q);
+      delete answers[q];
+    });
+  }
+
+  // Record this answer
+  answers[qNum] = val;
+
+  // Style the buttons
+  var card = document.getElementById('card-q' + qNum);
+  var yesBtn = card.querySelector('.btn-yes');
+  var noBtn  = card.querySelector('.btn-no');
+  yesBtn.classList.toggle('selected', val === 'yes');
+  noBtn.classList.toggle('selected',  val === 'no');
+
+  // Hide all outcome notes on this card first
+  card.querySelectorAll('.outcome-note').forEach(function(n){ n.classList.remove('show'); });
+
+  // Look up next step
+  var branch = tree[qNum] && tree[qNum][val];
+  if (!branch) return;
+
+  if (branch.outcome) {
+    // Show inline note
+    var noteId = 'note-q' + qNum + '-' + val;
+    var note = document.getElementById(noteId);
+    if (note) note.classList.add('show');
+    setBanner(branch.outcome);
+    updateTrail(null);
+  } else if (branch.next) {
+    setBanner('inprog');
+    showCard(branch.next);
+    visibleQuestions.push(branch.next);
+    updateTrail(branch.next);
+  }
+}
+
+function showCard(qNum) {
+  var el = document.getElementById('card-q' + qNum);
+  if (!el) return;
+  el.classList.add('visible');
+  setTimeout(function(){ el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }, 80);
+}
+
+function hideCard(qNum) {
+  var el = document.getElementById('card-q' + qNum);
+  if (!el) return;
+  el.classList.remove('visible');
+  // Clear button selections
+  el.querySelectorAll('.btn-yes,.btn-no').forEach(function(b){ b.classList.remove('selected'); });
+  // Hide notes
+  el.querySelectorAll('.outcome-note').forEach(function(n){ n.classList.remove('show'); });
+}
+
+function setBanner(code) {
+  var banner = document.getElementById('statusBanner');
+  var icon   = document.getElementById('statusIcon');
+  var value  = document.getElementById('statusValue');
+
+  // Remove all banner classes
+  banner.className = 'status-banner';
+
+  if (code === 'inprog') {
+    banner.classList.add('banner-inprog');
+    icon.textContent  = '⏳';
+    value.textContent = 'In Progress';
+  } else {
+    var o = outcomes[code];
+    banner.classList.add(o.banner);
+    icon.textContent  = o.icon;
+    value.textContent = o.label;
+  }
+}
+
+function updateTrail(nextQ) {
+  var trail = document.getElementById('progressTrail');
+  if (!nextQ) {
+    trail.innerHTML = 'Decision reached. Use the <strong>Reset</strong> button to start over.';
+  } else {
+    trail.innerHTML = 'Answering question <span>' + visibleQuestions.length + '</span> of up to 11.';
+  }
+}
+
+function resetAll() {
+  answers = {};
+  visibleQuestions = [1];
+
+  for (var q = 1; q <= 11; q++) {
+    var card = document.getElementById('card-q' + q);
+    if (!card) continue;
+    card.querySelectorAll('.btn-yes,.btn-no').forEach(function(b){ b.classList.remove('selected'); });
+    card.querySelectorAll('.outcome-note').forEach(function(n){ n.classList.remove('show'); });
+    if (q === 1) card.classList.add('visible');
+    else card.classList.remove('visible');
+  }
+
+  setBanner('inprog');
+  document.getElementById('progressTrail').textContent = 'Answer the questions below to determine eligibility.';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
