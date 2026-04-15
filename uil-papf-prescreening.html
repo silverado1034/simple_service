@@ -422,17 +422,17 @@
     background: linear-gradient(90deg, var(--green), var(--green-light));
   }
 
-  .terminal-card.fx-path {
-    background: rgba(142,68,173,0.08);
-    border: 1px solid rgba(142,68,173,0.35);
+  .terminal-card.verified {
+    background: rgba(41,128,185,0.08);
+    border: 1px solid rgba(41,128,185,0.35);
   }
 
-  .terminal-card.fx-path::before {
+  .terminal-card.verified::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #6c3483, #9b59b6);
+    background: linear-gradient(90deg, #1a5276, #2980b9);
   }
 
   .terminal-icon {
@@ -451,7 +451,7 @@
 
   .papf-needed .terminal-status { color: var(--red-light); }
   .no-papf .terminal-status { color: var(--green-light); }
-  .fx-path .terminal-status { color: #9b59b6; }
+  .verified .terminal-status { color: #5dade2; }
 
   .terminal-headline {
     font-family: 'DM Serif Display', serif;
@@ -660,6 +660,38 @@
     .container { padding: 32px 16px 60px; }
     footer { padding: 20px; flex-direction: column; gap: 8px; text-align: center; }
   }
+
+  /* ── TRANSITION BANNER ── */
+  .transition-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: rgba(230,126,34,0.08);
+    border: 1px solid rgba(230,126,34,0.35);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin-bottom: 24px;
+  }
+  .transition-banner-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .transition-banner-text {
+    font-size: 12px;
+    color: #e67e22;
+    line-height: 1.6;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+  }
+  .transition-banner-text strong {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    font-family: 'DM Mono', monospace;
+  }
 </style>
 </head>
 <body>
@@ -673,7 +705,7 @@
     </div>
   </div>
   <div class="header-meta">
-    <span class="draft-badge">Draft v0.6</span>
+    <span class="draft-badge">Draft v0.7</span>
   </div>
 </header>
 
@@ -731,81 +763,42 @@ const questions = {
   q1: {
     id: "q1",
     label: "Q1",
-    text: "Is this student a <strong>foreign exchange student</strong>?",
-    note: "Foreign exchange students participating through a recognized program (e.g., AFS, AISE, or similar) follow a distinct eligibility pathway.",
+    text: `Has the student attended a school <strong>other than <span class="school-name">${SCHOOL}</span></strong> in the <strong>last 12 months</strong>?`,
+    note: "This includes any school change — public, private, foreign exchange, or otherwise. If the student enrolled at any other school within the past 12 months, answer Yes.",
     answers: [
-      { label: "Yes", sub: "Student is a foreign exchange student", value: "yes", style: "fx-btn", icon: "✦", next: "terminal_fx" },
-      { label: "No", sub: "Student is a domestic student", value: "no", style: "no-btn", icon: "✕", next: "q2" }
+      { label: "Yes", sub: "Student attended another school in the last 12 months", value: "yes", style: "no-btn", icon: "✕", next: "q2" },
+      { label: "No", sub: "Student has only attended this school in the last 12 months", value: "no", style: "yes-btn", icon: "✓", next: "terminal_clear" }
     ]
   },
   q2: {
     id: "q2",
     label: "Q2",
-    text: "Has this student ever participated in any <strong>organized athletic activity</strong> at the high school level (grades 8–12)?",
-    note: "This includes UIL-sanctioned sports, club athletics, private school programs, and any competitive organized sport — regardless of whether the school was UIL-affiliated.",
+    text: "Is this student entering <strong>9th grade for the first time</strong> this school year?",
+    note: "Answer Yes only if this is the student's first time enrolling in 9th grade. Students in 10th grade or higher, or students repeating 9th grade, should be answered No.",
     answers: [
-      { label: "Yes", sub: "Student has participated in HS-level athletics", value: "yes", style: "yes-btn", icon: "✓", next: "q4" },
-      { label: "No", sub: "Student has no HS athletic history", value: "no", style: "no-btn", icon: "✕", next: "q3" }
+      { label: "Yes", sub: "First-time 9th grader this school year", value: "yes", style: "yes-btn", icon: "✓", next: "q3" },
+      { label: "No", sub: "Student is in 10th grade or higher", value: "no", style: "no-btn", icon: "✕", next: "terminal_papf" }
     ]
   },
   q3: {
     id: "q3",
     label: "Q3",
-    text: `Has this student attended any high school <strong>other than <span class="school-name">${SCHOOL}</span></strong> since starting 9th grade?`,
-    note: "A student with no athletic history who has never changed schools is clear. If they have attended another school, we need to check further.",
-    answers: [
-      { label: "No", sub: "Student has only ever attended this school", value: "no", style: "yes-btn", icon: "\u2713", next: "terminal_clear" },
-      { label: "Yes", sub: "Student has attended another high school", value: "yes", style: "no-btn", icon: "\u2715", next: "q3a" }
-    ]
-  },
-  q3a: {
-    id: "q3a",
-    label: "Q3A",
-    text: "Is this student entering <strong>9th grade for the first time</strong> this school year?",
-    note: "First-time 9th graders from a designated feeder middle school may be clear. Students in 10th grade or higher who changed schools still require a PAPF review.",
-    answers: [
-      { label: "Yes", sub: "First-time 9th grader this school year", value: "yes", style: "yes-btn", icon: "\u2713", next: "q3b" },
-      { label: "No", sub: "Student is in 10th grade or higher", value: "no", style: "no-btn", icon: "\u2715", next: "q3c" }
-    ]
-  },
-  q3b: {
-    id: "q3b",
-    label: "Q3B",
     text: `Is this student coming from a school that is a <strong>designated feeder middle school</strong> for <span class="school-name">${SCHOOL}</span>?`,
-    note: "If the student\'s previous school is not the designated feeder for this high school, they may be enrolling without a change of residence — which triggers the PAPF requirement.",
+    note: "If the student's previous school is a designated feeder school for this high school, they are following the standard enrollment path and no PAPF is required.",
     answers: [
-      { label: "Yes", sub: "Student is from a designated feeder school", value: "yes", style: "yes-btn", icon: "\u2713", next: "terminal_clear" },
-      { label: "No", sub: "Not from a designated feeder school", value: "no", style: "no-btn", icon: "\u2715", next: "terminal_papf" }
-    ]
-  },
-  q3c: {
-    id: "q3c",
-    label: "Q3C",
-    text: `Has the student attended a school <strong>other than <span class="school-name">${SCHOOL}</span></strong> in the <strong>last 12 months</strong>?`,
-    note: "A student who changed schools more than 12 months ago and has remained at this school since does not require a PAPF. Only recent school changes are flagged.",
-    answers: [
-      { label: "Yes", sub: "Student attended another school in the last 12 months", value: "yes", style: "no-btn", icon: "\u2715", next: "terminal_papf" },
-      { label: "No", sub: "No school change in the last 12 months", value: "no", style: "yes-btn", icon: "\u2713", next: "terminal_clear" }
+      { label: "Yes", sub: "Student is from a designated feeder school", value: "yes", style: "yes-btn", icon: "✓", next: "terminal_clear" },
+      { label: "No", sub: "Not from a designated feeder school", value: "no", style: "no-btn", icon: "✕", next: "q4" }
     ]
   },
   q4: {
     id: "q4",
     label: "Q4",
-    text: `Has the student participated in athletics at a school <strong>other than <span class="school-name">${SCHOOL}</span></strong> since starting 9th grade?`,
-    note: "This identifies students who have changed schools at any point during their high school athletic career.",
+    text: "Has the student <strong>already completed a PAPF application</strong> for the 2026–2027 school year?",
+    note: "This question applies during the current system transition only. If the student completed a PAPF on the previous UIL system, the School Admin will verify this manually. Do not select Yes unless you explicitly know the application has already been submitted.",
+    transition: true,
     answers: [
-      { label: "Yes", sub: "Student competed at another school since 9th grade", value: "yes", style: "yes-btn", icon: "✓", next: "q4a" },
-      { label: "No", sub: "Student has only competed at this school", value: "no", style: "no-btn", icon: "✕", next: "terminal_clear" }
-    ]
-  },
-  q4a: {
-    id: "q4a",
-    label: "Q4A",
-    text: `Has the student attended a school <strong>other than <span class="school-name">${SCHOOL}</span></strong> in the <strong>last 12 months</strong>?`,
-    note: "A transfer that occurred more than 12 months ago with no subsequent school change does not require a PAPF. Only recent transfers need further review.",
-    answers: [
-      { label: "Yes", sub: "Student attended another school in the last 12 months", value: "yes", style: "no-btn", icon: "✕", next: "terminal_papf" },
-      { label: "No", sub: "No school change in the last 12 months", value: "no", style: "yes-btn", icon: "✓", next: "terminal_clear" }
+      { label: "Yes", sub: "PAPF was completed on the previous UIL system", value: "yes", style: "yes-btn", icon: "✓", next: "terminal_verified" },
+      { label: "No", sub: "PAPF has not yet been completed", value: "no", style: "no-btn", icon: "✕", next: "terminal_papf" }
     ]
   }
 };
@@ -813,17 +806,10 @@ const questions = {
 const terminals = {
   terminal_papf: {
     type: "papf-needed",
-    icon: "⚑",
+    icon: "⚠",
     status: "PAPF Required",
     headline: "PAPF Needed",
     desc: "Based on this student's responses, a Participant Athletic Participation Form is required. The student must complete the PAPF before being cleared for athletic competition."
-  },
-  terminal_papf_edge: {
-    type: "papf-needed",
-    icon: "⚑",
-    status: "PAPF Required",
-    headline: "PAPF Needed",
-    desc: "This student is not a first-time 9th grader and has no recorded high school athletic history. This edge case requires a PAPF for administrative review and clearance."
   },
   terminal_clear: {
     type: "no-papf",
@@ -832,19 +818,19 @@ const terminals = {
     headline: "No PAPF Needed",
     desc: "Based on this student's responses, no Participant Athletic Participation Form is required. The student may proceed through standard enrollment and athletic clearance."
   },
-  terminal_fx: {
-    type: "fx-path",
-    icon: "✦",
-    status: "Foreign Exchange Pathway",
-    headline: "PAPF Required — FX Track",
-    desc: "Foreign exchange students follow a distinct eligibility pathway. A PAPF is required and should be flagged for the FX review process. Verify enrollment through an approved exchange program (AFS, AISE, or equivalent)."
+  terminal_verified: {
+    type: "verified",
+    icon: "📋",
+    status: "Pending Admin Verification",
+    headline: "PAPF Previously Submitted",
+    desc: "The student has indicated a PAPF was completed on the previous UIL system. A School Admin must verify this before the student is cleared. No new PAPF submission is required at this time."
   }
 };
 
 // ─── STATE ────────────────────────────────────────────────────────────────
 let history = []; // [{qId, answer, label}]
 let currentQ = "q1";
-let allQIds = ["q1","q2","q3","q3a","q3b","q3c","q4","q4a"];
+let allQIds = ["q1","q2","q3","q4"];
 
 // ─── RENDER ───────────────────────────────────────────────────────────────
 function render() {
@@ -880,10 +866,19 @@ function buildQuestion(q) {
   `).join('');
 
   const note = q.note ? `<div class="q-note">${q.note}</div>` : '';
+  const transitionBanner = q.transition ? `
+    <div class="transition-banner">
+      <span class="transition-banner-icon">⚠️</span>
+      <div class="transition-banner-text">
+        <strong>System Transition — 2026–2027 Only</strong>
+        This question is temporary. It applies only during the transition from the previous UIL system to this one. It will be removed in future school years.
+      </div>
+    </div>` : '';
 
   return `
     <div class="question-card">
       <div class="q-number">${q.label}</div>
+      ${transitionBanner}
       <div class="q-text">${q.text}</div>
       ${note}
       <div class="answers">${answerBtns}</div>
