@@ -673,7 +673,7 @@
     </div>
   </div>
   <div class="header-meta">
-    <span class="draft-badge">Draft v0.1</span>
+    <span class="draft-badge">Draft v0.2</span>
   </div>
 </header>
 
@@ -725,7 +725,7 @@
 
 <script>
 // ─── DATA ─────────────────────────────────────────────────────────────────
-const SCHOOL = "Sinton HS"; // configurable
+const SCHOOL = "Sinton High School"; // configurable
 
 const questions = {
   q1: {
@@ -751,21 +751,31 @@ const questions = {
   q3: {
     id: "q3",
     label: "Q3",
-    text: "Is this student entering <strong>9th grade for the first time</strong> this school year?",
-    note: "A student repeating a grade or otherwise older than expected for 9th grade may have a different eligibility window and requires additional review.",
+    text: `Has this student attended any high school <strong>other than <span class="school-name">${SCHOOL}</span></strong> since starting 9th grade?`,
+    note: "A student with no athletic history who has never changed schools is clear. If they have attended another school, we need to check further.",
     answers: [
-      { label: "Yes", sub: "First-time 9th grader", value: "yes", style: "yes-btn", icon: "✓", next: "q3a" },
-      { label: "No", sub: "Not a first-time 9th grader", value: "no", style: "no-btn", icon: "✕", next: "terminal_papf_edge" }
+      { label: "No", sub: "Student has only ever attended this school", value: "no", style: "yes-btn", icon: "\u2713", next: "terminal_clear" },
+      { label: "Yes", sub: "Student has attended another high school", value: "yes", style: "no-btn", icon: "\u2715", next: "q3a" }
     ]
   },
   q3a: {
     id: "q3a",
     label: "Q3A",
-    text: `Is this student coming from a school that is a <strong>designated feeder middle school</strong> for <span class="school-name">${SCHOOL}</span>?`,
-    note: "If the student's previous school is not the designated feeder for this high school, they may be enrolling without a corresponding change of residence, which triggers the PAPF requirement.",
+    text: "Is this student entering <strong>9th grade for the first time</strong> this school year?",
+    note: "First-time 9th graders from a designated feeder middle school may be clear. Students in 10th grade or higher who changed schools still require a PAPF review.",
     answers: [
-      { label: "Yes", sub: "Student is from a designated feeder school", value: "yes", style: "yes-btn", icon: "✓", next: "terminal_clear" },
-      { label: "No", sub: "Not from a designated feeder school", value: "no", style: "no-btn", icon: "✕", next: "terminal_papf" }
+      { label: "Yes", sub: "First-time 9th grader this school year", value: "yes", style: "yes-btn", icon: "\u2713", next: "q3b" },
+      { label: "No", sub: "Student is in 10th grade or higher", value: "no", style: "no-btn", icon: "\u2715", next: "terminal_papf_edge" }
+    ]
+  },
+  q3b: {
+    id: "q3b",
+    label: "Q3B",
+    text: `Is this student coming from a school that is a <strong>designated feeder middle school</strong> for <span class="school-name">${SCHOOL}</span>?`,
+    note: "If the student\'s previous school is not the designated feeder for this high school, they may be enrolling without a change of residence — which triggers the PAPF requirement.",
+    answers: [
+      { label: "Yes", sub: "Student is from a designated feeder school", value: "yes", style: "yes-btn", icon: "\u2713", next: "terminal_clear" },
+      { label: "No", sub: "Not from a designated feeder school", value: "no", style: "no-btn", icon: "\u2715", next: "terminal_papf" }
     ]
   },
   q4: {
@@ -844,7 +854,7 @@ const terminals = {
 // ─── STATE ────────────────────────────────────────────────────────────────
 let history = []; // [{qId, answer, label}]
 let currentQ = "q1";
-let allQIds = ["q1","q2","q3","q3a","q4","q5","q6","q7"];
+let allQIds = ["q1","q2","q3","q3a","q3b","q4","q5","q6","q7"];
 
 // ─── RENDER ───────────────────────────────────────────────────────────────
 function render() {
