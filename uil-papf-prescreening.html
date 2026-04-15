@@ -673,7 +673,7 @@
     </div>
   </div>
   <div class="header-meta">
-    <span class="draft-badge">Draft v0.5</span>
+    <span class="draft-badge">Draft v0.6</span>
   </div>
 </header>
 
@@ -804,38 +804,8 @@ const questions = {
     text: `Has the student attended a school <strong>other than <span class="school-name">${SCHOOL}</span></strong> in the <strong>last 12 months</strong>?`,
     note: "A transfer that occurred more than 12 months ago with no subsequent school change does not require a PAPF. Only recent transfers need further review.",
     answers: [
-      { label: "Yes", sub: "Student attended another school in the last 12 months", value: "yes", style: "no-btn", icon: "✕", next: "q5" },
+      { label: "Yes", sub: "Student attended another school in the last 12 months", value: "yes", style: "no-btn", icon: "✕", next: "terminal_papf" },
       { label: "No", sub: "No school change in the last 12 months", value: "no", style: "yes-btn", icon: "✓", next: "terminal_clear" }
-    ]
-  },
-  q5: {
-    id: "q5",
-    label: "Q5",
-    text: "Did the student's <strong>parent or guardian change their primary residence</strong> as part of this school change?",
-    note: "A bona fide change of residence by the parent or guardian is the key factor in UIL's transfer eligibility rule. This determines which path applies.",
-    answers: [
-      { label: "Yes", sub: "Family residence changed as part of the transfer", value: "yes", style: "yes-btn", icon: "✓", next: "q6" },
-      { label: "No", sub: "Residence did not change", value: "no", style: "no-btn", icon: "✕", next: "terminal_papf" }
-    ]
-  },
-  q6: {
-    id: "q6",
-    label: "Q6",
-    text: `Is the student's family now living within the <strong>attendance zone</strong> for <span class="school-name">${SCHOOL}</span>?`,
-    note: "If the family moved and the student's new address is within this school's attendance zone, the transfer is likely a legitimate residence-based move.",
-    answers: [
-      { label: "Yes", sub: "Family lives within this school's attendance zone", value: "yes", style: "yes-btn", icon: "✓", next: "terminal_clear" },
-      { label: "No", sub: "Family is outside the attendance zone", value: "no", style: "no-btn", icon: "✕", next: "terminal_papf" }
-    ]
-  },
-  q7: {
-    id: "q7",
-    label: "Q7",
-    text: `Has the student participated in athletics at a school <strong>other than <span class="school-name">${SCHOOL}</span></strong> in the <strong>last 12 months</strong>?`,
-    note: "The 12-month lookback window is the UIL standard threshold for identifying recent transfers that require the PAPF regardless of the reason for the move.",
-    answers: [
-      { label: "Yes", sub: "Student competed elsewhere in the past 12 months", value: "yes", style: "yes-btn", icon: "✓", next: "terminal_papf" },
-      { label: "No", sub: "No athletic participation at another school in last 12 months", value: "no", style: "no-btn", icon: "✕", next: "terminal_clear" }
     ]
   }
 };
@@ -874,7 +844,7 @@ const terminals = {
 // ─── STATE ────────────────────────────────────────────────────────────────
 let history = []; // [{qId, answer, label}]
 let currentQ = "q1";
-let allQIds = ["q1","q2","q3","q3a","q3b","q3c","q4","q4a","q5","q6","q7"];
+let allQIds = ["q1","q2","q3","q3a","q3b","q3c","q4","q4a"];
 
 // ─── RENDER ───────────────────────────────────────────────────────────────
 function render() {
