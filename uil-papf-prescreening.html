@@ -673,7 +673,7 @@
     </div>
   </div>
   <div class="header-meta">
-    <span class="draft-badge">Draft v0.2</span>
+    <span class="draft-badge">Draft v0.3</span>
   </div>
 </header>
 
@@ -765,7 +765,7 @@ const questions = {
     note: "First-time 9th graders from a designated feeder middle school may be clear. Students in 10th grade or higher who changed schools still require a PAPF review.",
     answers: [
       { label: "Yes", sub: "First-time 9th grader this school year", value: "yes", style: "yes-btn", icon: "\u2713", next: "q3b" },
-      { label: "No", sub: "Student is in 10th grade or higher", value: "no", style: "no-btn", icon: "\u2715", next: "terminal_papf_edge" }
+      { label: "No", sub: "Student is in 10th grade or higher", value: "no", style: "no-btn", icon: "\u2715", next: "q3c" }
     ]
   },
   q3b: {
@@ -776,6 +776,16 @@ const questions = {
     answers: [
       { label: "Yes", sub: "Student is from a designated feeder school", value: "yes", style: "yes-btn", icon: "\u2713", next: "terminal_clear" },
       { label: "No", sub: "Not from a designated feeder school", value: "no", style: "no-btn", icon: "\u2715", next: "terminal_papf" }
+    ]
+  },
+  q3c: {
+    id: "q3c",
+    label: "Q3C",
+    text: `Has the student attended a school <strong>other than <span class="school-name">${SCHOOL}</span></strong> in the <strong>last 12 months</strong>?`,
+    note: "A student who changed schools more than 12 months ago and has remained at this school since does not require a PAPF. Only recent school changes are flagged.",
+    answers: [
+      { label: "Yes", sub: "Student attended another school in the last 12 months", value: "yes", style: "no-btn", icon: "\u2715", next: "terminal_papf" },
+      { label: "No", sub: "No school change in the last 12 months", value: "no", style: "yes-btn", icon: "\u2713", next: "terminal_clear" }
     ]
   },
   q4: {
@@ -854,7 +864,7 @@ const terminals = {
 // ─── STATE ────────────────────────────────────────────────────────────────
 let history = []; // [{qId, answer, label}]
 let currentQ = "q1";
-let allQIds = ["q1","q2","q3","q3a","q3b","q4","q5","q6","q7"];
+let allQIds = ["q1","q2","q3","q3a","q3b","q3c","q4","q5","q6","q7"];
 
 // ─── RENDER ───────────────────────────────────────────────────────────────
 function render() {
