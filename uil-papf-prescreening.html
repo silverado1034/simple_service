@@ -673,7 +673,7 @@
     </div>
   </div>
   <div class="header-meta">
-    <span class="draft-badge">Draft v0.3</span>
+    <span class="draft-badge">Draft v0.4</span>
   </div>
 </header>
 
@@ -794,8 +794,18 @@ const questions = {
     text: `Has the student participated in athletics at a school <strong>other than <span class="school-name">${SCHOOL}</span></strong> since starting 9th grade?`,
     note: "This identifies students who have changed schools at any point during their high school athletic career.",
     answers: [
-      { label: "Yes", sub: "Student competed at another school since 9th grade", value: "yes", style: "yes-btn", icon: "✓", next: "q5" },
+      { label: "Yes", sub: "Student competed at another school since 9th grade", value: "yes", style: "yes-btn", icon: "✓", next: "q4a" },
       { label: "No", sub: "Student has only competed at this school", value: "no", style: "no-btn", icon: "✕", next: "terminal_clear" }
+    ]
+  },
+  q4a: {
+    id: "q4a",
+    label: "Q4A",
+    text: `Has the student attended a school <strong>other than <span class="school-name">${SCHOOL}</span></strong> in the <strong>last 12 months</strong>?`,
+    note: "A transfer that occurred more than 12 months ago with no subsequent school change does not require a PAPF. Only recent transfers need further review.",
+    answers: [
+      { label: "Yes", sub: "Student attended another school in the last 12 months", value: "yes", style: "no-btn", icon: "✕", next: "q5" },
+      { label: "No", sub: "No school change in the last 12 months", value: "no", style: "yes-btn", icon: "✓", next: "terminal_clear" }
     ]
   },
   q5: {
@@ -864,7 +874,7 @@ const terminals = {
 // ─── STATE ────────────────────────────────────────────────────────────────
 let history = []; // [{qId, answer, label}]
 let currentQ = "q1";
-let allQIds = ["q1","q2","q3","q3a","q3b","q3c","q4","q5","q6","q7"];
+let allQIds = ["q1","q2","q3","q3a","q3b","q3c","q4","q4a","q5","q6","q7"];
 
 // ─── RENDER ───────────────────────────────────────────────────────────────
 function render() {
